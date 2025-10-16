@@ -1,6 +1,11 @@
 const canvas = document.getElementById('pong');
 const ctx = canvas.getContext('2d');
 
+// Game constants
+const PADDLE_SPEED = 7;
+const SPEED_INCREMENT = 0.5;
+const MAX_BOUNCE_ANGLE = Math.PI / 4; // 45 degrees
+
 // Game objects
 const ball = {
     x: canvas.width / 2,
@@ -90,37 +95,37 @@ function drawScore() {
 function updatePaddles() {
     // Left paddle controls (W/S)
     if (keys['w'] && leftPaddle.y > 0) {
-        leftPaddle.y -= 7;
+        leftPaddle.y -= PADDLE_SPEED;
     }
     if (keys['s'] && leftPaddle.y < canvas.height - leftPaddle.height) {
-        leftPaddle.y += 7;
+        leftPaddle.y += PADDLE_SPEED;
     }
 
     // Right paddle controls (Arrow Up/Down)
     if (keys['ArrowUp'] && rightPaddle.y > 0) {
-        rightPaddle.y -= 7;
+        rightPaddle.y -= PADDLE_SPEED;
     }
     if (keys['ArrowDown'] && rightPaddle.y < canvas.height - rightPaddle.height) {
-        rightPaddle.y += 7;
+        rightPaddle.y += PADDLE_SPEED;
     }
 }
 
 // Collision detection
 function collision(ball, paddle) {
-    ball.top = ball.y - ball.radius;
-    ball.bottom = ball.y + ball.radius;
-    ball.left = ball.x - ball.radius;
-    ball.right = ball.x + ball.radius;
+    const ballTop = ball.y - ball.radius;
+    const ballBottom = ball.y + ball.radius;
+    const ballLeft = ball.x - ball.radius;
+    const ballRight = ball.x + ball.radius;
 
-    paddle.top = paddle.y;
-    paddle.bottom = paddle.y + paddle.height;
-    paddle.left = paddle.x;
-    paddle.right = paddle.x + paddle.width;
+    const paddleTop = paddle.y;
+    const paddleBottom = paddle.y + paddle.height;
+    const paddleLeft = paddle.x;
+    const paddleRight = paddle.x + paddle.width;
 
-    return ball.right > paddle.left && 
-           ball.bottom > paddle.top && 
-           ball.left < paddle.right && 
-           ball.top < paddle.bottom;
+    return ballRight > paddleLeft && 
+           ballBottom > paddleTop && 
+           ballLeft < paddleRight && 
+           ballTop < paddleBottom;
 }
 
 // Reset ball
@@ -151,7 +156,7 @@ function updateBall() {
         collidePoint = collidePoint / (paddle.height / 2);
         
         // Calculate angle in radians
-        let angleRad = collidePoint * Math.PI / 4;
+        let angleRad = collidePoint * MAX_BOUNCE_ANGLE;
         
         // Change velocity direction
         let direction = (ball.x < canvas.width / 2) ? 1 : -1;
@@ -159,7 +164,7 @@ function updateBall() {
         ball.velocityY = ball.speed * Math.sin(angleRad);
 
         // Increase ball speed
-        ball.speed += 0.5;
+        ball.speed += SPEED_INCREMENT;
     }
 
     // Update score
